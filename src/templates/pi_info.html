@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pi Info</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
+  <div class="bg-dark mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
+    <div class="my-3 py-3">
+
+    <table class="lead table table-dark">
+        <tbody>
+            <tr>
+                <th scope="row">model</th>
+                <td>{{ model }}</td>
+            </tr>
+            <tr>
+                <th scope="row">manufacturer</th>
+                <td>{{ manufacturer }}</td>
+            </tr>
+            <tr>
+                <th scope="row">pcb_revision</th>
+                <td>{{ pcb_revision }}</td>
+            </tr>
+            <tr>
+                <th scope="row">released</th>
+                <td>{{ released }}</td>
+            </tr>
+            <tr>
+                <th scope="row">revision</th>
+                <td>{{ revision }}</td>
+            </tr>
+            <tr>
+                <th scope="row">soc</th>
+                <td>{{ soc }}</td>
+            </tr>
+            <tr>
+                <th scope="row">csi</th>
+                <td>{{ csi }}</td>
+            </tr>
+            <tr>
+                <th scope="row">dsi</th>
+                <td>{{ dsi }}</td>
+            </tr>
+            <tr>
+                <th scope="row">memory</th>
+                <td>{{ memory }}</td>
+            </tr>
+            <tr>
+                <th scope="row">storage</th>
+                <td>{{ storage }}</td>
+            </tr>
+            <tr>
+                <th scope="row">usb</th>
+                <td>{{ usb }}</td>
+            </tr>
+            <tr>
+                <th scope="row">ethernet</th>
+                <td>{{ ethernet }}</td>
+            </tr>
+            <tr>
+                <th scope="row">wifi</th>
+                <td>{{ wifi }}</td>
+            </tr>
+            <tr>
+                <th scope="row">bluetooth</th>
+                <td>{{ bluetooth }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    </div>
+  </div>
+  <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+    <div class="my-3 p-3">
+
+    <table class="lead table">
+        <thead>
+            <tr>
+                <th scope="col">Pin</th>
+                <th scope="col">Name</th>
+                <th scope="col">Pull Up</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pin in pins %}<tr>
+                <td scope="row">{{ pin.number }}</td>
+                <td>{{ pin.function }}</td>
+                <td>{{ pin.pull_up }}</td>
+                <td>
+                    <div class="custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="led_{{ pin.number }}">
+                      <label class="custom-control-label" for="led_{{ pin.number }}">Led On</label>
+                    </div>
+                    <div class="custom-control custom-switch">
+                        <!-- $('#pull_up_{{ pin.number }}').prop('indeterminate', true) -->
+                      <input type="checkbox" class="custom-control-input" id="pull_up_{{ pin.number }}">
+                      <label class="custom-control-label" for="pull_up_{{ pin.number }}">Pull up</label>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                      <label for="pin_{{ pin.number }}_value" class="sr-only">Value</label>
+                      <input disabled="disabled" type="number" class="form-control" id="pin_{{ pin.number }}_value" placeholder="Value">
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm">Read</button>
+                </td>
+            </tr>{% endfor %}
+        </tbody>
+    </table>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
