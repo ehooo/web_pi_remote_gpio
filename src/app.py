@@ -11,6 +11,15 @@ REMOTE_PI_HOST = '127.0.0.1'
 REMOTE_PI_PORT = 8888
 REMOTE_GPIO = RemoteGPIO(REMOTE_PI_HOST, REMOTE_PI_PORT)
 
+INDEX_PINS = [
+    {
+        'pin': 17,
+        'type': 'led',
+        'name': 'light',
+        'pull_up': False,
+    },
+]
+
 
 @app.route('/info')
 def info():
@@ -33,12 +42,12 @@ def pin_action(pin, action):
         data['error'].append('Invalid action')
 
     if not data['error']:
-        pin_info = REMOTE_GPIO.pins[pin]
+        pi_info = REMOTE_GPIO.pins[pin]
         if action == 'read':
             data['data'] = {
                 'value': REMOTE_GPIO.read(pin),
-                'pull_up': pin_info['pull_up'],
-                'mode': pin_info['mode'],
+                'pull_up': pi_info['pull_up'],
+                'mode': pi_info['mode'],
             }
         elif action == 'on':
             REMOTE_GPIO.write(pin, True)
@@ -46,11 +55,14 @@ def pin_action(pin, action):
             REMOTE_GPIO.write(pin, False)
         elif action == 'info':
             data['data'] = {
-                'function': pin_info['function'],
-                'pull_up': pin_info['pull_up'],
-                'mode': pin_info['mode'],
-                'number': pin_info['number'],
+                'function': pi_info['function'],
+                'pull_up': pi_info['pull_up'],
+                'mode': pi_info['mode'],
+                'number': pi_info['number'],
+                'value': None,
             }
+            if pi_info['mode'] in [RemoteGPIO.MODE_IN, RemoteGPIO.MODE_OUT]:
+                data['data']['value'] = REMOTE_GPIO.read(pin)
         elif action == 'pull_up':
             REMOTE_GPIO.pull_up(pin)
         elif action == 'pull_down':
@@ -58,5 +70,20 @@ def pin_action(pin, action):
     return jsonify(data)
 
 
+@app.route('/')
+def index():
+    context = {
+        'pins': INDEX_PINS,
+    }
+    return render_template('index.html', **context)
+
+
 if __name__ == '__main__':
+    pi_info = REMOTE_GPIO.get_pi_info()
+    for pin in INDEX_PINS:
+        pin_type = pin.get('type', 'led')
+        if pin_type == 'led':
+            REMOTE_GPIO.write(pin.get('pin'), False)
+        elif pin_type == 'button':
+            REMOTE_GPIO.read(pin.get('pin'), pin.get('pull_up', True))
     app.run(host='0.0.0.0')

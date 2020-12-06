@@ -3,124 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Pi Info</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha254-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    <script>
-
-function hide_all(pin) {
-            $('#led_' + pin).parent('.custom-control').hide();
-            $('#pull_up_' + pin).parent('.custom-control').hide();
-            $('#pin_' + pin + '_value').hide();
-            $('#read_' + pin).hide();
-        }
-function show_led(pin) {
-    $('#led_' + pin).parent('.custom-control').show();
-}
-function show_button(pin) {
-    $('#pull_up_' + pin).parent('.custom-control').show();
-    $('#pin_' + pin + '_value').show();
-    $('#read_' + pin).show();
-}
-function show_all(pin) {
-    show_led(pin);
-    show_button(pin);
-}
-function check_pin(pin) {
-    $.ajax('/' + pin + '/info/', {
-        'beforeSend': function (){
-            hide_all(pin);
-        },
-        'success': function(data) {
-            if(data.data.mode == null) {
-                $('#pull_up_' + pin).prop('indeterminate', true);
-                show_all(data.pin);
-            } else if(data.data.mode === 'output') {
-                show_led(data.pin);
-            } else if(data.data.mode === 'input') {
-                if (data.data.pull_up) {
-                    $('#pull_up_' + data.pin).attr('checked', 'checked');
-                } else {
-                    $('#pull_up_' + data.pin).removeAttr('checked');
-                }
-                show_button(data.pin);
-            }
-        },
-    });
-}
-function led_change(pin, on) {
-    let action = 'on';
-    if (!on) {
-        action = 'off';
-    }
-    $.ajax('/' + pin + '/' + action + '/', {
-        'beforeSend': function (){
-            $('#led_' + pin).attr('disabled', 'disabled');
-        },
-        'success': function() {
-            check_pin(pin);
-        },
-        'complete': function () {
-            $('#led_' + pin).removeAttr('disabled');
-        }
-    });
-}
-function pull_change(pin, up) {
-    let action = 'pull_up';
-    if (!up) {
-        action = 'pull_down';
-    }
-    $.ajax('/' + pin + '/' + action + '/', {
-        'beforeSend': function (){
-            $('#pull_up_' + pin).attr('disabled', 'disabled');
-        },
-        'success': function() {
-            check_pin(pin);
-        },
-        'complete': function () {
-            $('#pull_up_' + pin).removeAttr('disabled');
-        }
-    });
-}
-function read(pin) {
-    $.ajax('/' + pin + '/read/', {
-        'beforeSend': function (){
-            $('#read_' + pin).attr('disabled', 'disabled');
-        },
-        'success': function(data) {
-            $('pin_' + data.pin + '_value').val(data.value);
-            check_pin(pin);
-        },
-        'complete': function () {
-            $('#read_' + pin).removeAttr('disabled');
-        }
-    });
-
-}
-
-$(document).ready(function (){
-    $('input[type="checkbox"]').change(function (){
-        let self = $(this);
-        let pin = self.parents('tr[data-pin]').attr('data-pin');
-        if(self.hasClass('led')){
-            led_change(pin, self.prop('checked'));
-        } else if(self.hasClass('pull_up')) {
-            pull_change(pin, self.prop('checked'));
-        }
-    });
-    $('button[type="button"]').change(function (){
-        let self = $(this);
-        let pin = self.parents('tr[data-pin]').attr('data-pin');
-        read(pin);
-    });
-    $.each($('td[scope="row"]'), function (index, val){
-        check_pin($(val).text());
-    });
-});
-
-    </script>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <script src="/static/jquery-3.4.1.min.js"></script>
+    <script src="/static/popper.min.js"></script>
+    <script src="/static/bootstrap.min.js"></script>
+    <script src="/static/pin_controler.js"></script>
 </head>
 <body>
 
@@ -204,7 +91,7 @@ $(document).ready(function (){
             </tr>
         </thead>
         <tbody>
-            {% for pin in pins %}<tr data-pin="{{ pin.pin }}">
+            {% for pin in pins.values() %}<tr data-pin="{{ pin.pin }}">
                 <td scope="row">{{ pin.pin }}</td>
                 <td>{{ pin.function }}</td>
                 <td>{{ pin.pull_up }}</td>
@@ -219,7 +106,7 @@ $(document).ready(function (){
                     </div>
                     <div class="form-group mx-sm-3 mb-2">
                       <label for="pin_{{ pin.pin }}_value" class="sr-only">Value</label>
-                      <input disabled="disabled" type="number" class="form-control pin-value"
+                      <input disabled="disabled" type="text" class="form-control pin-value"
                              id="pin_{{ pin.pin }}_value" placeholder="Value">
                     </div>
                     <button type="button" class="btn btn-primary btn-sm read" id="read_{{ pin.pin }}">Read</button>

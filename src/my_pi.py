@@ -1,6 +1,7 @@
 from typing import Union
 
 from gpiozero import Button, LED, PWMLED
+from gpiozero import GPIOPinInUse, PinFixedPull
 from gpiozero import pi_info as pi_info_funct
 from gpiozero.pins.pigpio import PiGPIOFactory
 
@@ -51,7 +52,11 @@ class RemoteGPIO(object):
             self.pins[pin_number]['mode'] in [None, self.MODE_IN]
         ):
             self.pins[pin_number]['mode'] = self.MODE_IN
-            self.pins[pin_number]['obj'] = Button(pin_number, pull_up=False, pin_factory=self.remote_gpio)
+            try:
+                self.pins[pin_number]['obj'] = Button(pin_number, pull_up=False, pin_factory=self.remote_gpio)
+            except PinFixedPull:
+                self.pins[pin_number]['obj'] = Button(pin_number, pull_up=True, pin_factory=self.remote_gpio)
+                return False
             return True
         return False
 
@@ -60,14 +65,19 @@ class RemoteGPIO(object):
             pin_number in self.pins and
             self.pins[pin_number]['mode'] in [None, self.MODE_OUT]
         ):
-            self.pins[pin_number]['mode'] = self.MODE_OUT
-            if self.pins[pin_number]['obj'] is None:
-                self.pins[pin_number]['obj'] = LED(pin_number, pin_factory=self.remote_gpio)
-            if value:
-                self.pins[pin_number]['obj'].on()
-            else:
-                self.pins[pin_number]['obj'].off()
-            return True
+            try:
+                self.pins[pin_number]['mode'] = self.MODE_OUT
+                if self.pins[pin_number]['obj'] is None:
+                    self.pins[pin_number]['obj'] = LED(pin_number, pin_factory=self.remote_gpio)
+                if value:
+                    self.pins[pin_number]['obj'].on()
+                else:
+                    self.pins[pin_number]['obj'].off()
+                return True
+            except GPIOPinInUse:
+                del(self.pins[pin_number])
+            except ValueError:
+                del(self.pins[pin_number])
         return False
 
     def pwm(self, pin_number: int, value: float) -> bool:
@@ -111,15 +121,11 @@ class RemoteGPIO(object):
                             'function': pin.function,
                             'pull_up': pin.pull_up,
                             'number': pin.number,
+                            'pin': pin_number,
                             'mode': None,
                             'obj': None,
                         }
-                        self._pi_info['pins'].append({
-                            'pin': pin_number,
-                            'number': pin.number,
-                            'function': pin.function,
-                            'pull_up': pin.pull_up,
-                        })
+            self._pi_info['pins'] = self.pins
         return self._pi_info
 
 
