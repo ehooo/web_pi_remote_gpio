@@ -1,0 +1,12 @@
+[Unit]
+Description=Web Pi Remote GPIO
+
+[Service]
+Type=simple
+PIDFile=/run/web_pi_remote_gpio.pid
+ExecStart=/usr/bin/python3 /home/pi/code/web_pi_remote_gpio/src/app.py
+Restart=on-failure
+ExecStop=/bin/kill -s QUIT $MAINPID
+
+[Install]
+WantedBy=multi-user.target
