@@ -118,7 +118,7 @@ class RemoteGPIO(object):
                     if pin.function.startswith('GPIO'):
                         pin_number = int(pin.function.replace('GPIO', ''))
                         self.pins[pin_number] = {
-                            'function': pin.function,
+                            'name': pin.function,
                             'pull_up': pin.pull_up,
                             'number': pin.number,
                             'pin': pin_number,

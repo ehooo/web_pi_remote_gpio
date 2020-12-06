@@ -11,14 +11,14 @@ REMOTE_PI_HOST = '127.0.0.1'
 REMOTE_PI_PORT = 8888
 REMOTE_GPIO = RemoteGPIO(REMOTE_PI_HOST, REMOTE_PI_PORT)
 
-INDEX_PINS = [
-    {
+INDEX_PINS = {
+    17: {
         'pin': 17,
         'type': 'led',
         'name': 'light',
         'pull_up': False,
     },
-]
+}
 
 
 @app.route('/info')
@@ -55,7 +55,7 @@ def pin_action(pin, action):
             REMOTE_GPIO.write(pin, False)
         elif action == 'info':
             data['data'] = {
-                'function': pi_info['function'],
+                'name': pi_info['name'],
                 'pull_up': pi_info['pull_up'],
                 'mode': pi_info['mode'],
                 'number': pi_info['number'],
@@ -80,7 +80,7 @@ def index():
 
 if __name__ == '__main__':
     pi_info = REMOTE_GPIO.get_pi_info()
-    for pin in INDEX_PINS:
+    for pin in INDEX_PINS.values():
         pin_type = pin.get('type', 'led')
         if pin_type == 'led':
             REMOTE_GPIO.write(pin.get('pin'), False)
