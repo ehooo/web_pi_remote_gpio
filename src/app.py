@@ -78,6 +78,38 @@ def index():
     return render_template('index.html', **context)
 
 
+@app.route('/led/<int:pin>/')
+def led_control(pin):
+    context = {
+        'pin': pin,
+        'error': [],
+        'data': None,
+    }
+    if not REMOTE_GPIO.pins:
+        REMOTE_GPIO.get_pi_info()
+    if pin not in REMOTE_GPIO.pins:
+        context['error'].append('Invalid Pin')
+
+    pi_info = REMOTE_GPIO.pins[pin]
+    if pi_info['mode'] in [None, RemoteGPIO.MODE_OUT]:
+        context['error'].append('Invalid Pin Mode')
+
+    if not context['error']:
+        context['data'] = {
+            'name': pi_info['name'],
+            'pull_up': pi_info['pull_up'],
+            'mode': pi_info['mode'],
+            'number': pi_info['number'],
+            'value': None,
+        }
+        if pi_info['obj'] is None:
+            REMOTE_GPIO.write(pin, False)
+        if pi_info['mode'] in [RemoteGPIO.MODE_IN, RemoteGPIO.MODE_OUT]:
+            context['data']['value'] = REMOTE_GPIO.read(pin)
+
+    return render_template('led.html', **context)
+
+
 if __name__ == '__main__':
     pi_info = REMOTE_GPIO.get_pi_info()
     for pin in INDEX_PINS.values():

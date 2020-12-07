@@ -1,4 +1,3 @@
-
 function hide_all(pin) {
             $('#led_' + pin).parent('.custom-control').hide();
             $('#pull_up_' + pin).parent('.custom-control').hide();
@@ -67,7 +66,6 @@ function led_change(pin, on) {
     });
 }
 
-
 function just_read(pin) {
     $.ajax('/' + pin + '/read/', {
         'success': function(data) {
@@ -100,19 +98,3 @@ function read(pin) {
         }
     });
 }
-
-$(document).ready(function (){
-    $('input[type="checkbox"].led').change(function (){
-        let self = $(this);
-        let pin = self.parents('tr[data-pin]').attr('data-pin');
-        led_change(pin, self.prop('checked'));
-    });
-    $('button[type="button"]').click(function (){
-        let self = $(this);
-        let pin = self.parents('tr[data-pin]').attr('data-pin');
-        read(pin);
-    });
-    $.each($('td[scope="row"]'), function (index, val){
-        check_pin($(val).text());
-    });
-});

@@ -1,4 +1,24 @@
 {% extends 'base.html' %}
+{% block extra_head %}
+<script>
+    $(document).ready(function (){
+        $('input[type="checkbox"].led').change(function (){
+            let self = $(this);
+            let pin = self.parents('tr[data-pin]').attr('data-pin');
+            led_change(pin, self.prop('checked'));
+        });
+        $('button[type="button"]').click(function (){
+            let self = $(this);
+            let pin = self.parents('tr[data-pin]').attr('data-pin');
+            read(pin);
+        });
+        $.each($('td[scope="row"]'), function (index, val){
+            check_pin($(val).text());
+        });
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 {% include "pin_table_actions.html" ignore missing with context %}
 {% endblock %}

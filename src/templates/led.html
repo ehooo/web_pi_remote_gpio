@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Led Control{% endblock %}
+
+{% block extra_head %}
+<script>
+    var status = '{% if data.value %}true{% else %}false{% endif %}';
+    function check_pin(pin) {
+        if (status === 'true'){
+            $('#halcon_back').css("fill","rgb(80, 90, 145)");
+            $('#rebels_logo').css("fill","rgb(195, 32, 32)");
+        } else {
+            $('#halcon_back').css("fill","rgb(255, 255, 255)");
+            $('#rebels_logo').css("fill","rgb(255, 255, 255)");
+        }
+    }
+
+    $(document).ready(function (){
+        if (status === 'true'){
+            led_change('{{ pin }}', true);
+        } else {
+            led_change('{{ pin }}', false);
+        }
+        $('#led_toggle').click(function (){
+            if(status === 'true') {
+                status = false;
+            } else{
+                status = true;
+            }
+            led_change('{{ pin }}', status);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="button" id="led_toggle">
+{% include "led_icon.svg" ignore missing %}
+</div>
+{% endblock %}
