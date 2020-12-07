@@ -36,6 +36,7 @@
         }
     }
 
+{% if not errors %}
     $(document).ready(function (){
         if (status === 'true'){
             led_change('{{ pin }}', true);
@@ -44,18 +45,21 @@
         }
         $('#led_toggle').click(function (){
             if(status === 'true') {
-                status = false;
+                status = 'false';
             } else{
-                status = true;
+                status = 'true';
             }
-            led_change('{{ pin }}', status);
+            led_change('{{ pin }}', status === 'true');
         });
     });
+{% endif %}
 </script>
 {% endblock %}
 
 {% block content %}
+{% if not errors %}
 <div class="button" id="led_toggle">
 {% include "led_icon.svg" ignore missing %}
 </div>
+{% endif %}
 {% endblock %}

@@ -10,7 +10,7 @@
         {% for pin in pins.values() %}<tr data-pin="{{ pin.pin }}">
             <td scope="row">{{ pin.pin }}</td>
             <td>{{ pin.name }}</td>
-            <td id="actions_pin_{{ pin.pin }}">
+            <td id="actions_pin_{{ pin.pin }}" class="{{ pin.type }}">
                 {% if not pin.type or pin.type == 'led' %}
                 <div class="custom-control custom-switch">
                   <input type="checkbox" class="custom-control-input led" id="led_{{ pin.pin }}">

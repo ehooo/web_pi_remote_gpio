@@ -24,7 +24,7 @@ function check_pin(pin) {
             hide_all(pin);
         },
         'success': function(data) {
-            if(data.error.length) return;
+            if(data.errors.length) return;
             if(data.data.mode == null) {
                 $('#pull_up_' + pin).prop('indeterminate', true);
                 show_all(data.pin);

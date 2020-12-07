@@ -31,17 +31,17 @@ def pin_action(pin, action):
     data = {
         'pin': pin,
         'action': action,
-        'error': [],
+        'errors': [],
         'data': None,
     }
     if not REMOTE_GPIO.pins:
         REMOTE_GPIO.get_pi_info()
     if pin not in REMOTE_GPIO.pins:
-        data['error'].append('Invalid Pin')
+        data['errors'].append('Invalid Pin')
     if action not in ['read', 'on', 'off', 'info', 'pull_up', 'pull_down']:
-        data['error'].append('Invalid action')
+        data['errors'].append('Invalid action')
 
-    if not data['error']:
+    if not data['errors']:
         pi_info = REMOTE_GPIO.pins[pin]
         if action == 'read':
             data['data'] = {
@@ -82,7 +82,7 @@ def index():
 def led_control(pin):
     context = {
         'pin': pin,
-        'error': [],
+        'errors': [],
         'data': None,
     }
     if not REMOTE_GPIO.pins:
@@ -91,10 +91,10 @@ def led_control(pin):
         context['error'].append('Invalid Pin')
 
     pi_info = REMOTE_GPIO.pins[pin]
-    if pi_info['mode'] in [None, RemoteGPIO.MODE_OUT]:
-        context['error'].append('Invalid Pin Mode')
+    if pi_info['mode'] not in [None, RemoteGPIO.MODE_OUT]:
+        context['errors'].append('Invalid Pin Mode')
 
-    if not context['error']:
+    if not context['errors']:
         context['data'] = {
             'name': pi_info['name'],
             'pull_up': pi_info['pull_up'],
